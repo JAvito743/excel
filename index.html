@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Juegos de funciones de Excel</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#107C41; --verde2:#0B5E31; --verdeClaro:#E7F4EC; --menta:#C9EBD6;
+  --tinta:#1D2B24; --gris:#5E6B64; --linea:#D5DED8; --fondo:#F5F8F6;
+  --amarillo:#FFC83D; --amarilloClaro:#FFF4D1; --rojo:#D13438; --rojoClaro:#FDE7E8;
+  --azul:#2B6CB0; --azulClaro:#E3EEFA; --morado:#7B4FD0;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Nunito,system-ui,sans-serif;color:var(--tinta);background:var(--fondo);-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,var(--verde),var(--verde2));color:#fff;padding:22px 16px 64px;position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.wrap{max-width:980px;margin:0 auto;position:relative;z-index:1}
+h1{margin:0;font-size:clamp(24px,5vw,36px);font-weight:900;letter-spacing:-.5px}
+header p{margin:6px 0 0;opacity:.92;font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px}
+.chip b{color:var(--amarillo)}
+nav{max-width:980px;margin:-44px auto 0;padding:0 12px;position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tab{border:none;background:#fff;border-radius:14px;padding:12px 6px;font:inherit;font-weight:800;font-size:14px;color:var(--gris);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:4px;transition:.15s}
+.tab .ic{font-size:24px}
+.tab.on{background:var(--amarillo);color:var(--tinta);transform:translateY(-3px)}
+main{max-width:980px;margin:0 auto;padding:18px 12px 60px}
+.panel{display:none}.panel.on{display:block;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:#fff;border-radius:18px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px}
+.inst{display:flex;gap:12px;align-items:flex-start;background:var(--azulClaro);border-radius:14px;padding:12px 14px;font-size:14.5px;line-height:1.45;margin-bottom:14px}
+.inst .ic{font-size:22px;line-height:1}
+h2{margin:0 0 4px;font-size:22px;font-weight:900}
+h3{margin:0 0 8px;font-size:16px;font-weight:800}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:none;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:var(--verdeClaro);color:var(--verde2);transition:.12s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--verde);color:#fff}
+.btn.am{background:var(--amarillo);color:var(--tinta)}
+.btn.gh{background:#EEF1EF;color:var(--gris)}
+.msg{margin-top:12px;padding:12px 14px;border-radius:12px;font-weight:700;font-size:14.5px;display:none;line-height:1.45}
+.msg.ok{display:block;background:var(--verdeClaro);color:var(--verde2)}
+.msg.bad{display:block;background:var(--rojoClaro);color:#8E1F22}
+.msg.info{display:block;background:var(--amarilloClaro);color:#6B4E00}
+
+/* CRUCIGRAMA */
+.cw-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:760px){.cw-layout{grid-template-columns:1fr}}
+.cw-scroll{overflow-x:auto;padding-bottom:4px}
+.cw-grid{display:grid;gap:2px;margin:0 auto;width:max-content}
+.cw-c{width:var(--cs);height:var(--cs);position:relative}
+.cw-c.bl{background:transparent}
+.cw-c input{width:100%;height:100%;border:2px solid var(--linea);border-radius:6px;text-align:center;font:inherit;font-weight:900;font-size:calc(var(--cs)*.5);text-transform:uppercase;padding:0;color:var(--tinta);background:#fff;caret-color:transparent;outline:none}
+.cw-c .n{position:absolute;top:1px;left:3px;font-size:calc(var(--cs)*.26);font-weight:800;color:var(--gris);pointer-events:none}
+.cw-c.word input{background:var(--amarilloClaro);border-color:#F2D27A}
+.cw-c.act input{background:var(--amarillo);border-color:#D9A400}
+.cw-c.good input{background:var(--menta);border-color:#7CC79A;color:var(--verde2)}
+.cw-c.bad input{background:var(--rojoClaro);border-color:#EE9A9C;color:var(--rojo)}
+.cw-c.rev input{color:var(--azul)}
+.clue-now{background:var(--tinta);color:#fff;border-radius:12px;padding:10px 12px;font-weight:700;font-size:14.5px;margin-bottom:12px;min-height:44px}
+.clue-now span{color:var(--amarillo)}
+.clues h3{color:var(--verde)}
+.clues ol{list-style:none;margin:0 0 14px;padding:0}
+.clues li{padding:7px 10px;border-radius:10px;cursor:pointer;font-size:14px;line-height:1.35;display:flex;gap:8px}
+.clues li b{min-width:22px;color:var(--verde)}
+.clues li:hover{background:#F1F5F2}
+.clues li.on{background:var(--amarilloClaro)}
+.clues li.done{text-decoration:line-through;color:var(--gris)}
+.clues li.done b{color:var(--gris)}
+
+/* SOPA */
+.ws-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:760px){.ws-layout{grid-template-columns:1fr}}
+.ws-grid{display:grid;gap:3px;touch-action:none;user-select:none;-webkit-user-select:none;margin:0 auto;width:max-content}
+.ws-c{width:var(--ws);height:var(--ws);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:calc(var(--ws)*.52);border-radius:8px;background:#F1F5F2;cursor:pointer;transition:background .1s}
+.ws-c.sel{background:var(--amarillo)}
+.ws-c.start{background:var(--amarillo);box-shadow:inset 0 0 0 3px #D9A400}
+.ws-c.found{color:#fff}
+.ws-c.flash{animation:flash .45s}
+@keyframes flash{50%{background:var(--rojoClaro);color:var(--rojo)}}
+.wl{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.wl span{padding:6px 10px;border-radius:999px;background:#EEF1EF;font-weight:800;font-size:13px;font-family:"JetBrains Mono",monospace}
+.wl span.f{background:var(--verde);color:#fff;text-decoration:line-through}
+.learn{border-left:5px solid var(--verde);background:var(--verdeClaro);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.45;margin-top:10px}
+.learn code,.mono{font-family:"JetBrains Mono",monospace;background:#fff;padding:2px 6px;border-radius:6px;font-size:13px;color:var(--verde2);border:1px solid var(--menta)}
+.bar{height:10px;background:#EEF1EF;border-radius:99px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--verde),#3FBF74);width:0;transition:width .4s}
+
+/* ROMPECABEZAS */
+.sheet{overflow-x:auto;border-radius:12px;border:1px solid var(--linea)}
+table.xl{border-collapse:collapse;font-size:14px;width:100%;min-width:380px;background:#fff}
+table.xl th,table.xl td{border:1px solid #E1E7E3;padding:6px 8px;text-align:center}
+table.xl th{background:#F0F3F1;color:var(--gris);font-weight:800;font-size:12px}
+table.xl td.hd{font-weight:800;background:var(--verdeClaro);color:var(--verde2)}
+table.xl td.hi{background:var(--amarilloClaro);box-shadow:inset 0 0 0 2px var(--amarillo)}
+table.xl td.res{background:var(--menta);font-weight:900;color:var(--verde2)}
+.steps{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.steps i{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:13px;background:#EEF1EF;color:var(--gris);cursor:pointer}
+.steps i.on{background:var(--amarillo);color:var(--tinta)}
+.steps i.ok{background:var(--verde);color:#fff}
+.goal{font-size:17px;font-weight:800;margin:14px 0 4px}
+.goal small{display:block;font-weight:600;color:var(--gris);font-size:14px;margin-top:2px}
+.fx{display:flex;align-items:stretch;border:2px solid var(--verde);border-radius:12px;overflow:hidden;margin:12px 0;min-height:52px;background:#fff}
+.fx .lab{background:var(--verde);color:#fff;font-weight:900;font-style:italic;padding:0 12px;display:flex;align-items:center;font-family:Georgia,serif}
+.fx .slots{flex:1;display:flex;flex-wrap:wrap;gap:5px;padding:7px;align-items:center}
+.fx .ph{color:#A3AEA8;font-size:14px;font-weight:600;padding-left:4px}
+.pc{border:none;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px;padding:8px 11px;border-radius:9px;cursor:pointer;transition:.12s;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.pc:active{transform:translateY(2px);box-shadow:none}
+.pc.fn{background:#DCEBFF;color:#1C4E89}
+.pc.rg{background:#E6F6EC;color:var(--verde2)}
+.pc.sy{background:#F1ECFB;color:#55309E}
+.pc.tx{background:#FFF0D6;color:#8A5A00}
+.pc.used{opacity:.25;pointer-events:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:2px dashed var(--linea);border-radius:12px;background:#FBFCFB}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--gris);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:var(--c)}
+.explain{margin-top:12px}
+.explain ol{margin:8px 0 0;padding-left:20px;line-height:1.55}
+.final{text-align:center;padding:26px 16px}
+.final .big{font-size:56px}
+.note{font-size:13px;color:var(--gris);margin-top:10px;line-height:1.4}
+.confetti{position:fixed;top:-10px;width:10px;height:14px;z-index:99;pointer-events:none;animation:fall linear forwards;border-radius:2px}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🎮 Juega y aprende Excel</h1>
+    <p>Crucigrama, sopa de letras y rompecabezas de fórmulas · Tecnología e Informática · Grado 7°</p>
+    <div class="chips">
+      <div class="chip">🧩 Crucigrama: <b id="sc-cw">0</b>/<span id="sc-cw-t">0</span></div>
+      <div class="chip">🔎 Sopa: <b id="sc-ws">0</b>/<span id="sc-ws-t">0</span></div>
+      <div class="chip">🧠 Fórmulas: <b id="sc-pz">0</b>/<span id="sc-pz-t">0</span></div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="tab on" data-p="cw"><span class="ic">✏️</span>Crucigrama</button>
+  <button class="tab" data-p="ws"><span class="ic">🔎</span>Sopa de letras</button>
+  <button class="tab" data-p="pz"><span class="ic">🧩</span>Rompecabezas</button>
+</nav>
+
+<main>
+<!-- CRUCIGRAMA -->
+<section class="panel on" id="p-cw">
+  <div class="inst"><span class="ic">💡</span><div><b>Cómo se juega:</b> toca una casilla o una pista y escribe. Toca otra vez la misma casilla para cambiar entre horizontal y vertical. Escribe sin tildes ni puntos (por ejemplo <b>FORMULA</b>).</div></div>
+  <div class="cw-layout">
+    <div class="card">
+      <div class="clue-now" id="cw-now">Toca una casilla para empezar ✍️</div>
+      <div class="cw-scroll"><div class="cw-grid" id="cw-grid"></div></div>
+      <div class="btns">
+        <button class="btn pri" id="cw-check">✔ Verificar</button>
+        <button class="btn am" id="cw-hint">💡 Pista (una letra)</button>
+        <button class="btn gh" id="cw-reset">↺ Reiniciar</button>
+      </div>
+      <div class="msg" id="cw-msg"></div>
+    </div>
+    <div class="card clues">
+      <h3>➡️ Horizontales</h3><ol id="cw-a"></ol>
+      <h3>⬇️ Verticales</h3><ol id="cw-d"></ol>
+    </div>
+  </div>
+</section>
+
+<!-- SOPA -->
+<section class="panel" id="p-ws">
+  <div class="inst"><span class="ic">💡</span><div><b>Cómo se juega:</b> arrastra el dedo o el mouse desde la primera hasta la última letra. También puedes tocar la primera letra y luego la última. Las palabras van → ↓ ↘ ↗. Cada vez que encuentres una, aprenderás para qué sirve.</div></div>
+  <div class="ws-layout">
+    <div class="card">
+      <div class="ws-grid" id="ws-grid"></div>
+      <div class="btns">
+        <button class="btn am" id="ws-hint">💡 Pista</button>
+        <button class="btn gh" id="ws-new">🔀 Nueva sopa</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Palabras por encontrar</h3>
+      <div class="bar"><i id="ws-bar"></i></div>
+      <div class="wl" id="ws-list"></div>
+      <div id="ws-learn"><div class="learn">👆 Encuentra una palabra para ver su explicación aquí.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROMPECABEZAS -->
+<section class="panel" id="p-pz">
+  <div class="inst"><span class="ic">💡</span><div><b>Cómo se juega:</b> lee el reto, mira la tabla y toca las piezas en el orden correcto para armar la fórmula. Toca una pieza de la barra <b>fx</b> para quitarla. ¡Cuidado, hay piezas que sobran!</div></div>
+  <div class="card">
+    <div class="steps" id="pz-steps"></div>
+    <h3>📊 Hoja: Notas del grupo</h3>
+    <div class="sheet"><table class="xl" id="pz-table"></table></div>
+    <div id="pz-body"></div>
+  </div>
+</section>
+</main>
+
+<script>
+/* ===================== DATOS ===================== */
+const CW_WORDS = [
+  {w:"REDONDEAR", c:"Función que deja un número con los decimales que tú elijas: =____(3,48;1) da 3,5"},
+  {w:"PROMEDIO",  c:"Función que calcula la media: suma los valores y divide entre cuántos son"},
+  {w:"CONDICION", c:"Lo que revisa la función SI antes de decidir, por ejemplo C2>=3"},
+  {w:"COLUMNA",   c:"Línea vertical de la hoja; se identifica con una letra (A, B, C…)"},
+  {w:"FORMULA",   c:"Operación que siempre empieza con el signo igual (=)"},
+  {w:"CONTAR",    c:"Función que dice cuántas celdas de un rango tienen números"},
+  {w:"CELDA",     c:"Cuadrito donde se cruzan una fila y una columna, como B4"},
+  {w:"RANGO",     c:"Grupo de celdas seguidas que se escribe con dos puntos, como A1:A10"},
+  {w:"LIBRO",     c:"Así se llama el archivo completo de Excel"},
+  {w:"SUMA",      c:"Función que junta (adiciona) todos los números de un rango"},
+  {w:"FILA",      c:"Línea horizontal de la hoja; se identifica con un número"},
+  {w:"HOJA",      c:"Cada pestaña de abajo dentro de un libro de Excel"},
+  {w:"MAX",       c:"Función que encuentra el número más alto"},
+  {w:"MIN",       c:"Función que encuentra el número más bajo"}
+];
+
+const WS_WORDS = {
+  "SUMA":"<b>SUMA</b> junta todos los números de un rango. <code>=SUMA(D2:D6)</code> suma desde D2 hasta D6.",
+  "PROMEDIO":"<b>PROMEDIO</b> suma los valores y divide entre la cantidad. <code>=PROMEDIO(C2:C6)</code> da la nota media del grupo.",
+  "MAX":"<b>MAX</b> encuentra el valor más alto. <code>=MAX(D2:D6)</code> te dice el mejor puntaje.",
+  "MIN":"<b>MIN</b> encuentra el valor más bajo. <code>=MIN(C2:C6)</code> te dice la nota más baja.",
+  "CONTAR":"<b>CONTAR</b> dice cuántas celdas tienen <i>números</i> (ignora textos y vacías). <code>=CONTAR(C2:C6)</code>",
+  "CONTARSI":"<b>CONTAR.SI</b> cuenta solo las celdas que cumplen una condición. <code>=CONTAR.SI(C2:C6;\">=3\")</code> cuenta cuántos aprobaron.",
+  "SUMARSI":"<b>SUMAR.SI</b> suma solo lo que cumple una condición. <code>=SUMAR.SI(B2:B6;1;D2:D6)</code> suma los puntos del grupo 1.",
+  "REDONDEAR":"<b>REDONDEAR</b> deja un número con los decimales que pidas. <code>=REDONDEAR(3,48;1)</code> da <b>3,5</b>.",
+  "CELDA":"Una <b>CELDA</b> es el cruce de una columna y una fila. <code>B4</code> = columna B, fila 4.",
+  "RANGO":"Un <b>RANGO</b> es un grupo de celdas. <code>A1:A10</code> se lee “desde A1 hasta A10”.",
+  "FORMULA":"Toda <b>FÓRMULA</b> empieza con <code>=</code>. Sin el igual, Excel la toma como texto."
+};
+const WS_LABEL = {CONTARSI:"CONTAR.SI", SUMARSI:"SUMAR.SI", FORMULA:"FÓRMULA"};
+
+const SHEET = {
+  cols:["A","B","C","D"],
+  head:["Estudiante","Grupo","Nota","Puntos"],
+  rows:[["Ana",1,4.5,18],["Luis",2,2.8,12],["Sara",1,3.6,15],["Juan",2,4.0,20],["Mía",1,2.5,10]]
+};
+// t: fn=función, rg=rango/celda, sy=símbolo, tx=texto/número
+const PZ = [
+  {goal:"¿Cuántos puntos sumaron entre todos?", hint:"Usa la función que junta todos los números de la columna Puntos.",
+   ans:["=","SUMA","(","D2:D6",")"], extra:["PROMEDIO","C2:C6"], hi:["D"], result:"75",
+   steps:["<code>=</code> le avisa a Excel que viene una fórmula.","<code>SUMA</code> es la función que adiciona.","<code>D2:D6</code> es el rango de los puntos (de D2 hasta D6).","Excel hace 18 + 12 + 15 + 20 + 10 = <b>75</b>."]},
+  {goal:"¿Cuál es la nota promedio del grupo?", hint:"Las notas están en la columna C.",
+   ans:["=","PROMEDIO","(","C2:C6",")"], extra:["SUMA","D2:D6"], hi:["C"], result:"3,48",
+   steps:["<code>PROMEDIO</code> suma y luego divide entre la cantidad de datos.","Suma: 4,5 + 2,8 + 3,6 + 4,0 + 2,5 = 17,4.","Hay 5 notas: 17,4 ÷ 5 = <b>3,48</b>."]},
+  {goal:"¿Cuál fue el puntaje más alto?", hint:"Busca la función que encuentra el valor mayor.",
+   ans:["=","MAX","(","D2:D6",")"], extra:["MIN","C2:C6"], hi:["D"], result:"20",
+   steps:["<code>MAX</code> revisa todo el rango y se queda con el número más grande.","Entre 18, 12, 15, 20 y 10, el mayor es <b>20</b> (Juan).","Si usaras <code>MIN</code> obtendrías el menor: 10."]},
+  {goal:"¿Cuántos estudiantes aprobaron (nota 3 o más)?", hint:"Necesitas contar, pero solo los que cumplen la condición \">=3\".",
+   ans:["=","CONTAR.SI","(","C2:C6",";","\">=3\"",")"], extra:["CONTAR","\"<3\""], hi:["C"], result:"3",
+   steps:["<code>CONTAR.SI</code> necesita dos cosas: <b>dónde</b> buscar y <b>qué condición</b> cumplir.","Dónde: <code>C2:C6</code> (las notas).","Condición: <code>\">=3\"</code> va entre comillas.","Cumplen: 4,5 – 3,6 – 4,0 → <b>3</b> estudiantes."]},
+  {goal:"¿Ana aprobó o reprobó?", hint:"La función SI tiene 3 partes: condición ; si es verdad ; si es falso.",
+   ans:["=","SI","(","C2>=3",";","\"Aprobó\"",";","\"Reprobó\"",")"], extra:["C2<3","SUMA"], hi:["C2"], result:"Aprobó",
+   steps:["<code>SI</code> toma una decisión según una <b>condición</b>.","Condición: <code>C2>=3</code> → ¿la nota de Ana es mayor o igual a 3?","Si es VERDAD muestra <code>\"Aprobó\"</code>; si es FALSO muestra <code>\"Reprobó\"</code>.","Ana tiene 4,5 → la condición es verdadera → <b>Aprobó</b>."]},
+  {goal:"¿Cuántos puntos hizo el grupo 1?", hint:"SUMAR.SI: dónde buscar ; qué buscar ; qué sumar.",
+   ans:["=","SUMAR.SI","(","B2:B6",";","1",";","D2:D6",")"], extra:["C2:C6","2"], hi:["B","D"], result:"43",
+   steps:["<code>SUMAR.SI</code> suma solo las filas que cumplen algo.","1° Dónde buscar: <code>B2:B6</code> (columna Grupo).","2° Qué buscar: <code>1</code> (el grupo 1).","3° Qué sumar: <code>D2:D6</code> (los puntos).","Grupo 1 = Ana 18 + Sara 15 + Mía 10 = <b>43</b>."]},
+  {goal:"Reto final: el promedio redondeado a 1 decimal", hint:"Una función puede ir DENTRO de otra. Primero REDONDEAR, adentro el PROMEDIO.",
+   ans:["=","REDONDEAR","(","PROMEDIO","(","C2:C6",")",";","1",")"], extra:["SUMA","2"], hi:["C"], result:"3,5",
+   steps:["Aquí hay una función <b>dentro</b> de otra (se llama anidar).","Excel primero resuelve lo de adentro: <code>PROMEDIO(C2:C6)</code> = 3,48.","Luego <code>REDONDEAR(3,48;1)</code> deja 1 decimal.","Como el 8 es mayor o igual a 5, sube: <b>3,5</b>."]}
+];
+const FN_SET = new Set(["SUMA","PROMEDIO","MAX","MIN","CONTAR","CONTAR.SI","SI","SUMAR.SI","REDONDEAR"]);
+const SY_SET = new Set(["=","(",")",";"]);
+function pieceType(p){ if(FN_SET.has(p)) return "fn"; if(SY_SET.has(p)) return "sy"; if(/^[A-Z]\d/.test(p)) return "rg"; return "tx"; }
+
+/* ===================== UTIL ===================== */
+const $ = s => document.querySelector(s);
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function shuffle(a,r=Math.random){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function confetti(n=60){ const cols=["#107C41","#FFC83D","#2B6CB0","#D13438","#7B4FD0","#3FBF74"]; for(let i=0;i<n;i++){const d=document.createElement("div");d.className="confetti";d.style.left=Math.random()*100+"vw";d.style.background=cols[i%cols.length];d.style.animationDuration=(1.6+Math.random()*1.6)+"s";d.style.animationDelay=Math.random()*.4+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),3800);} }
+function showMsg(el,type,html){ el.className="msg "+type; el.innerHTML=html; }
+
+/* ===================== TABS ===================== */
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id==="p-"+b.dataset.p));
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+/* ===================== CRUCIGRAMA ===================== */
+function buildCrossword(list){
+  const N=44, G=[...Array(N)].map(()=>Array(N).fill(null)), D=[...Array(N)].map(()=>[...Array(N)].map(()=>({a:false,d:false})));
+  const words=list.slice().sort((x,y)=>y.w.length-x.w.length), placed=[];
+  const empty=(r,c)=>r<0||c<0||r>=N||c>=N||!G[r][c];
+  function can(w,r,c,dir){
+    const dr=dir==="d"?1:0, dc=dir==="a"?1:0;
+    if(r<0||c<0||r+dr*(w.length-1)>=N||c+dc*(w.length-1)>=N) return -1;
+    if(!empty(r-dr,c-dc)||!empty(r+dr*w.length,c+dc*w.length)) return -1;
+    let inter=0;
+    for(let i=0;i<w.length;i++){
+      const rr=r+dr*i, cc=c+dc*i, ch=G[rr][cc];
+      if(ch){ if(ch!==w[i]||D[rr][cc][dir]) return -1; inter++; }
+      else if(!empty(rr+dc,cc+dr)||!empty(rr-dc,cc-dr)) return -1;
+    }
+    return inter;
+  }
+  function put(o,r,c,dir){
+    const dr=dir==="d"?1:0, dc=dir==="a"?1:0;
+    for(let i=0;i<o.w.length;i++){G[r+dr*i][c+dc*i]=o.w[i]; D[r+dr*i][c+dc*i][dir]=true;}
+    placed.push({...o,r,c,dir});
+  }
+  const f=words[0]; put(f,22,22-Math.floor(f.w.length/2),"a");
+  let pending=words.slice(1);
+  for(let pass=0;pass<4&&pending.length;pass++){
+    const left=[];
+    for(const o of pending){
+      let best=null;
+      for(const p of placed) for(let j=0;j<p.w.length;j++){
+        const pr=p.r+(p.dir==="d"?j:0), pc=p.c+(p.dir==="a"?j:0), dir=p.dir==="a"?"d":"a";
+        for(let i=0;i<o.w.length;i++){ if(o.w[i]!==p.w[j]) continue;
+          const r=pr-(dir==="d"?i:0), c=pc-(dir==="a"?i:0), s=can(o.w,r,c,dir);
+          if(s>0){ // preferir más cruces y cuadrícula compacta
+            const sc=s*100-Math.abs(r-22)-Math.abs(c-22);
+            if(!best||sc>best.sc) best={r,c,dir,sc};
+          }
+        }
+      }
+      if(best) put(o,best.r,best.c,best.dir); else left.push(o);
+    }
+    pending=left;
+  }
+  let r0=N,c0=N,r1=0,c1=0;
+  placed.forEach(p=>{const len=p.w.length;r0=Math.min(r0,p.r);c0=Math.min(c0,p.c);r1=Math.max(r1,p.r+(p.dir==="d"?len-1:0));c1=Math.max(c1,p.c+(p.dir==="a"?len-1:0));});
+  placed.forEach(p=>{p.r-=r0;p.c-=c0;});
+  placed.sort((a,b)=>a.r-b.r||a.c-b.c);
+  let num=0; const starts={};
+  placed.forEach(p=>{const k=p.r+","+p.c; if(!starts[k]) starts[k]=++num; p.n=starts[k];});
+  return {rows:r1-r0+1, cols:c1-c0+1, words:placed};
+}
+
+const CW = buildCrossword(CW_WORDS);
+let cwCells={}, cwDir="a", cwActive=null, cwWord=null, cwLastClick=null;
+$("#sc-cw-t").textContent=CW.words.length;
+
+function cwRender(){
+  const grid=$("#cw-grid"); grid.innerHTML="";
+  const cs=Math.max(24,Math.min(38,Math.floor((Math.min(window.innerWidth,980)*(window.innerWidth>760?.55:1)-70)/CW.cols)));
+  grid.style.setProperty("--cs",cs+"px");
+  grid.style.gridTemplateColumns=`repeat(${CW.cols},${cs}px)`;
+  cwCells={};
+  CW.words.forEach(p=>{ for(let i=0;i<p.w.length;i++){const r=p.r+(p.dir==="d"?i:0),c=p.c+(p.dir==="a"?i:0),k=r+","+c;
+    cwCells[k]=cwCells[k]||{r,c,ch:p.w[i],words:{}}; cwCells[k].words[p.dir]=p; if(i===0) cwCells[k].n=p.n; }});
+  for(let r=0;r<CW.rows;r++) for(let c=0;c<CW.cols;c++){
+    const k=r+","+c, d=document.createElement("div"); d.className="cw-c";
+    const cell=cwCells[k];
+    if(!cell){d.classList.add("bl");grid.appendChild(d);continue;}
+    const inp=document.createElement("input"); inp.maxLength=2; inp.autocomplete="off"; inp.setAttribute("autocapitalize","characters"); inp.spellcheck=false;
+    inp.value=cell.val||"";
+    cell.el=d; cell.inp=inp; d.appendChild(inp);
+    if(cell.n){const n=document.createElement("span");n.className="n";n.textContent=cell.n;d.appendChild(n);}
+    inp.addEventListener("pointerdown",()=>{ if(cwActive===cell && cwLastClick===cell && cell.words.a && cell.words.d){cwDir=cwDir==="a"?"d":"a"; setTimeout(()=>cwSelect(cell),0);} cwLastClick=cell; });
+    inp.addEventListener("focus",()=>cwSelect(cell));
+    inp.addEventListener("input",e=>{
+      const v=(inp.value||"").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-ZÑ]/g,"");
+      const ch=v.slice(-1); inp.value=ch; cell.val=ch; d.classList.remove("good","bad","rev");
+      if(ch) cwMove(1);
+    });
+    inp.addEventListener("keydown",e=>{
+      if(e.key==="Backspace"&&!inp.value){e.preventDefault();cwMove(-1,true);}
+      else if(e.key.startsWith("Arrow")){e.preventDefault();
+        const m={ArrowRight:[0,1,"a"],ArrowLeft:[0,-1,"a"],ArrowDown:[1,0,"d"],ArrowUp:[-1,0,"d"]}[e.key];
+        const nx=cwCells[(cell.r+m[0])+","+(cell.c+m[1])]; if(cell.words[m[2]]) cwDir=m[2]; if(nx) nx.inp.focus(); else cwSelect(cell);}
+    });
+    grid.appendChild(d);
+  }
+  ["a","d"].forEach(dir=>{
+    const ol=$("#cw-"+dir); ol.innerHTML="";
+    CW.words.filter(p=>p.dir===dir).sort((a,b)=>a.n-b.n).forEach(p=>{
+      const li=document.createElement("li"); li.innerHTML=`<b>${p.n}</b><span>${p.c} <i style="color:#8A968F">(${p.w.length})</i></span>`;
+      li.onclick=()=>{cwDir=dir; const k=p.r+","+p.c; cwCells[k].inp.focus(); cwSelect(cwCells[k]);};
+      p.li=li; ol.appendChild(li);
+    });
+  });
+  cwScore();
+}
+function cwSelect(cell){
+  if(!cell.words[cwDir]) cwDir=cell.words.a?"a":"d";
+  cwActive=cell; cwWord=cell.words[cwDir];
+  Object.values(cwCells).forEach(x=>x.el.classList.remove("act","word"));
+  cwWordCells(cwWord).forEach(x=>x.el.classList.add("word")); cell.el.classList.add("act");
+  CW.words.forEach(p=>p.li.classList.toggle("on",p===cwWord));
+  $("#cw-now").innerHTML=`<span>${cwWord.n} ${cwDir==="a"?"➡️ Horizontal":"⬇️ Vertical"}:</span> ${cwWord.c}`;
+}
+function cwWordCells(p){ return [...p.w].map((_,i)=>cwCells[(p.r+(p.dir==="d"?i:0))+","+(p.c+(p.dir==="a"?i:0))]); }
+function cwMove(step,clear){
+  if(!cwWord) return; const cells=cwWordCells(cwWord), i=cells.indexOf(cwActive), nx=cells[i+step];
+  if(nx){ if(clear){nx.inp.value="";nx.val="";nx.el.classList.remove("good","bad","rev");} nx.inp.focus(); cwSelect(nx); }
+  cwScore();
+}
+function cwScore(){
+  let ok=0; CW.words.forEach(p=>{const good=cwWordCells(p).every(x=>x.val===x.ch); p.li&&p.li.classList.toggle("done",good); if(good) ok++;});
+  $("#sc-cw").textContent=ok; return ok;
+}
+$("#cw-check").onclick=()=>{
+  let filled=0,bad=0; Object.values(cwCells).forEach(x=>{x.el.classList.remove("good","bad"); if(x.val){filled++; x.el.classList.add(x.val===x.ch?"good":"bad"); if(x.val!==x.ch) bad++;}});
+  const ok=cwScore(), tot=CW.words.length;
+  if(ok===tot){showMsg($("#cw-msg"),"ok","🏆 ¡Crucigrama completo! Dominas el vocabulario de Excel."); confetti();}
+  else if(!filled) showMsg($("#cw-msg"),"info","Aún no has escrito nada. ¡Empieza por una palabra que conozcas!");
+  else showMsg($("#cw-msg"),bad?"bad":"info",`Llevas <b>${ok} de ${tot}</b> palabras completas. ${bad?`Hay <b>${bad}</b> letra(s) en rojo para corregir.`:"Todo lo que escribiste está bien, ¡sigue!"}`);
+};
+$("#cw-hint").onclick=()=>{
+  let target=cwActive&&cwActive.val!==cwActive.ch?cwActive:null;
+  if(!target&&cwWord) target=cwWordCells(cwWord).find(x=>x.val!==x.ch);
+  if(!target) target=Object.values(cwCells).find(x=>x.val!==x.ch);
+  if(!target) return;
+  target.val=target.ch; target.inp.value=target.ch; target.el.classList.remove("bad"); target.el.classList.add("rev");
+  cwScore(); showMsg($("#cw-msg"),"info","💡 Te revelé una letra (aparece en azul).");
+};
+$("#cw-reset").onclick=()=>{ Object.values(cwCells).forEach(x=>{x.val="";x.inp.value="";x.el.classList.remove("good","bad","rev");}); cwScore(); $("#cw-msg").className="msg"; };
+let rz; window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{cwRender(); if(cwActive) cwSelect(cwActive);},200);});
+cwRender();
+
+/* ===================== SOPA DE LETRAS ===================== */
+const WS_SIZE=12, WS_COLORS=["#107C41","#2B6CB0","#7B4FD0","#D9480F","#0E8A8A","#B83280","#2F855A","#C05621","#3949AB","#00897B","#8E24AA"];
+let WS, wsFound={}, wsStart=null, wsDrag=false, wsSeed=7;
+function buildWS(seed){
+  const r=rng(seed), G=[...Array(WS_SIZE)].map(()=>Array(WS_SIZE).fill("")), dirs=[[0,1],[1,0],[1,1],[-1,1]], places={};
+  const words=Object.keys(WS_WORDS).sort((a,b)=>b.length-a.length);
+  for(const w of words){
+    let ok=false;
+    for(let t=0;t<500&&!ok;t++){
+      const [dr,dc]=dirs[Math.floor(r()*dirs.length)], R=Math.floor(r()*WS_SIZE), C=Math.floor(r()*WS_SIZE);
+      const er=R+dr*(w.length-1), ec=C+dc*(w.length-1);
+      if(er<0||er>=WS_SIZE||ec>=WS_SIZE) continue;
+      let fit=true; for(let i=0;i<w.length;i++){const ch=G[R+dr*i][C+dc*i]; if(ch&&ch!==w[i]){fit=false;break;}}
+      if(!fit) continue;
+      for(let i=0;i<w.length;i++) G[R+dr*i][C+dc*i]=w[i];
+      places[w]={r:R,c:C,dr,dc}; ok=true;
+    }
+  }
+  const AB="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for(let i=0;i<WS_SIZE;i++) for(let j=0;j<WS_SIZE;j++) if(!G[i][j]) G[i][j]=AB[Math.floor(r()*26)];
+  return {G,places,words:words.filter(w=>places[w])};
+}
+function wsInit(){
+  WS=buildWS(wsSeed); wsFound={}; wsStart=null;
+  const grid=$("#ws-grid"), sz=Math.max(24,Math.min(40,Math.floor((Math.min(window.innerWidth,980)*(window.innerWidth>760?.55:1)-70)/WS_SIZE)));
+  grid.style.setProperty("--ws",sz+"px"); grid.style.gridTemplateColumns=`repeat(${WS_SIZE},${sz}px)`; grid.innerHTML="";
+  for(let i=0;i<WS_SIZE;i++) for(let j=0;j<WS_SIZE;j++){const d=document.createElement("div");d.className="ws-c";d.textContent=WS.G[i][j];d.dataset.r=i;d.dataset.c=j;grid.appendChild(d);}
+  $("#sc-ws-t").textContent=WS.words.length;
+  $("#ws-learn").innerHTML='<div class="learn">👆 Encuentra una palabra para ver su explicación aquí.</div>';
+  wsList();
+}
+function wsCell(r,c){ return $(`#ws-grid .ws-c[data-r="${r}"][data-c="${c}"]`); }
+function wsLine(a,b){
+  const dr=Math.sign(b.r-a.r), dc=Math.sign(b.c-a.c), lr=Math.abs(b.r-a.r), lc=Math.abs(b.c-a.c);
+  if(!(lr===0||lc===0||lr===lc)) return null;
+  const n=Math.max(lr,lc)+1, out=[]; for(let i=0;i<n;i++) out.push({r:a.r+dr*i,c:a.c+dc*i}); return out;
+}
+function wsClearSel(){ document.querySelectorAll(".ws-c.sel,.ws-c.start").forEach(x=>x.classList.remove("sel","start")); }
+function wsPreview(end){ wsClearSel(); if(!wsStart) return; const line=wsLine(wsStart,end)||[wsStart]; line.forEach(p=>wsCell(p.r,p.c).classList.add("sel")); }
+function wsFinish(end){
+  const line=wsLine(wsStart,end); wsClearSel(); const st=wsStart; wsStart=null;
+  if(!line||line.length<2) return;
+  const s=line.map(p=>WS.G[p.r][p.c]).join(""), rev=[...s].reverse().join("");
+  const w=WS.words.find(x=>!wsFound[x]&&(x===s||x===rev));
+  if(w){
+    const color=WS_COLORS[Object.keys(wsFound).length%WS_COLORS.length]; wsFound[w]=line;
+    line.forEach(p=>{const el=wsCell(p.r,p.c);el.classList.add("found");el.style.background=color;});
+    $("#ws-learn").innerHTML=`<div class="learn" style="border-color:${color}">✅ <b>¡Encontraste ${WS_LABEL[w]||w}!</b><br>${WS_WORDS[w]}</div>`;
+    wsList();
+    if(Object.keys(wsFound).length===WS.words.length){ confetti(); $("#ws-learn").insertAdjacentHTML("beforeend",'<div class="msg ok">🏆 ¡Encontraste todas las palabras! Excelente trabajo.</div>'); }
+  } else line.forEach(p=>{const el=wsCell(p.r,p.c); if(!el.classList.contains("found")){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");}});
+}
+function wsList(){
+  const n=Object.keys(wsFound).length;
+  $("#ws-list").innerHTML=WS.words.slice().sort().map(w=>`<span class="${wsFound[w]?"f":""}">${WS_LABEL[w]||w}</span>`).join("");
+  $("#ws-bar").style.width=(n/WS.words.length*100)+"%"; $("#sc-ws").textContent=n;
+}
+function wsPoint(e){ const el=document.elementFromPoint(e.clientX,e.clientY); return el&&el.classList.contains("ws-c")?{r:+el.dataset.r,c:+el.dataset.c}:null; }
+const wg=$("#ws-grid");
+wg.addEventListener("pointerdown",e=>{ const p=wsPoint(e); if(!p) return; e.preventDefault();
+  if(wsStart&&!(wsStart.r===p.r&&wsStart.c===p.c)){ wsFinish(p); return; }
+  wsStart=p; wsDrag=true; wsPreview(p); wsCell(p.r,p.c).classList.add("start"); });
+wg.addEventListener("pointermove",e=>{ if(!wsDrag||!wsStart) return; const p=wsPoint(e); if(p) wsPreview(p); });
+window.addEventListener("pointerup",e=>{ if(!wsDrag) return; wsDrag=false; const p=wsPoint(e);
+  if(p&&wsStart&&!(p.r===wsStart.r&&p.c===wsStart.c)) wsFinish(p);
+  else if(wsStart){ wsClearSel(); wsCell(wsStart.r,wsStart.c).classList.add("start"); } });
+$("#ws-hint").onclick=()=>{ const w=WS.words.find(x=>!wsFound[x]); if(!w) return; const p=WS.places[w], el=wsCell(p.r,p.c);
+  el.classList.remove("flash"); void el.offsetWidth; el.style.boxShadow="inset 0 0 0 3px #D9A400"; setTimeout(()=>el.style.boxShadow="",2200);
+  $("#ws-learn").innerHTML=`<div class="learn">💡 Busca <b>${WS_LABEL[w]||w}</b>: empieza en la casilla que se iluminó.</div>`; };
+$("#ws-new").onclick=()=>{ wsSeed=Math.floor(Math.random()*1e9); wsInit(); };
+wsInit();
+
+/* ===================== ROMPECABEZAS ===================== */
+let pzI=0, pzSel=[], pzDone=new Set(), pzPool=[];
+$("#sc-pz-t").textContent=PZ.length;
+function fmt(v){ return typeof v==="number"&&!Number.isInteger(v)?String(v).replace(".",","):(typeof v==="number"&&SHEET.head.length&&v%1===0&&String(v).length<3&&v>2&&v<5?v.toFixed(1).replace(".",","):v); }
+function pzTable(hi,showRes){
+  const ch=SHEET.cols.map(c=>`<th>${c}</th>`).join("");
+  let h=`<tr><th></th>${ch}<th>E</th></tr><tr><th>1</th>${SHEET.head.map(x=>`<td class="hd">${x}</td>`).join("")}<td class="hd">Resultado</td></tr>`;
+  SHEET.rows.forEach((row,ri)=>{ h+=`<tr><th>${ri+2}</th>${row.map((v,ci)=>{const col=SHEET.cols[ci], cell=col+(ri+2);
+      const on=hi.includes(col)||hi.includes(cell); const val=ci===2?Number(v).toFixed(1).replace(".",","):v; return `<td class="${on?"hi":""}">${val}</td>`;}).join("")}
+      <td class="${showRes&&ri===0?"res":""}">${showRes&&ri===0?showRes:""}</td></tr>`; });
+  $("#pz-table").innerHTML=h;
+}
+function pzSteps(){ $("#pz-steps").innerHTML=PZ.map((_,i)=>`<i class="${pzDone.has(i)?"ok":""} ${i===pzI?"on":""}" data-i="${i}">${pzDone.has(i)?"✓":i+1}</i>`).join("")+`<i class="${pzI===PZ.length?"on":""}" data-i="${PZ.length}">🏁</i>`;
+  document.querySelectorAll("#pz-steps i").forEach(x=>x.onclick=()=>pzGo(+x.dataset.i)); }
+function pzGo(i){
+  pzI=i; pzSel=[]; pzSteps();
+  if(i>=PZ.length){ pzTable([],null);
+    $("#pz-body").innerHTML=`<div class="final"><div class="big">${pzDone.size===PZ.length?"🏆":"🧩"}</div><h2>${pzDone.size===PZ.length?"¡Eres un maestro de las fórmulas!":"¡Casi lo logras!"}</h2>
+      <p>Armaste <b>${pzDone.size} de ${PZ.length}</b> fórmulas.</p>
+      <div class="learn" style="text-align:left"><b>Repaso rápido:</b><br>
+      <code>SUMA</code> junta · <code>PROMEDIO</code> saca la media · <code>MAX</code>/<code>MIN</code> mayor y menor ·
+      <code>CONTAR.SI</code> cuenta con condición · <code>SI</code> decide entre dos respuestas · <code>SUMAR.SI</code> suma con condición · <code>REDONDEAR</code> ajusta decimales.</div>
+      <div class="btns" style="justify-content:center"><button class="btn pri" onclick="pzDone.clear();$('#sc-pz').textContent=0;pzGo(0)">↺ Jugar de nuevo</button></div></div>`;
+    if(pzDone.size===PZ.length) confetti(90); return; }
+  const q=PZ[i]; pzTable(q.hi,null);
+  pzPool=shuffle([...q.ans,...q.extra].map((p,k)=>({p,k})));
+  $("#pz-body").innerHTML=`
+    <div class="goal">Reto ${i+1}: ${q.goal}<small>El resultado irá en la celda <b>E2</b>.</small></div>
+    <div class="fx"><div class="lab">fx</div><div class="slots" id="pz-slots"></div></div>
+    <div class="pool" id="pz-pool"></div>
+    <div class="legend"><span style="--c:#DCEBFF">Función</span><span style="--c:#E6F6EC">Celda o rango</span><span style="--c:#F1ECFB">Símbolo</span><span style="--c:#FFF0D6">Texto o número</span></div>
+    <div class="btns"><button class="btn pri" id="pz-check">✔ Comprobar</button><button class="btn am" id="pz-hint">💡 Pista</button><button class="btn gh" id="pz-clear">↺ Borrar</button></div>
+    <div class="msg" id="pz-msg"></div><div id="pz-exp"></div>
+    <p class="note">ℹ️ En Excel en español (Colombia) los argumentos se separan con punto y coma <b>;</b> y los decimales con coma <b>,</b>.</p>`;
+  pzDraw();
+  $("#pz-check").onclick=pzCheck; $("#pz-clear").onclick=()=>{pzSel=[];pzDraw();$("#pz-msg").className="msg";};
+  $("#pz-hint").onclick=()=>{ const q=PZ[pzI]; let ok=0; while(ok<pzSel.length&&pzSel[ok].p===q.ans[ok]) ok++;
+    if(ok===q.ans.length){showMsg($("#pz-msg"),"info","Ya tienes todas las piezas. ¡Pulsa Comprobar!");return;}
+    showMsg($("#pz-msg"),"info",`💡 ${q.hint}<br>Las primeras <b>${ok}</b> pieza(s) están bien. La siguiente es <code>${q.ans[ok]}</code>.`); };
+}
+function pzDraw(){
+  const slots=$("#pz-slots"), pool=$("#pz-pool");
+  slots.innerHTML=pzSel.length?"":'<span class="ph">Toca las piezas para armar la fórmula…</span>';
+  pzSel.forEach((o,idx)=>{const b=document.createElement("button");b.className="pc "+pieceType(o.p);b.textContent=o.p;b.title="Quitar";b.onclick=()=>{pzSel.splice(idx,1);pzDraw();};slots.appendChild(b);});
+  pool.innerHTML="";
+  pzPool.forEach(o=>{const b=document.createElement("button");b.className="pc "+pieceType(o.p)+(pzSel.includes(o)?" used":"");b.textContent=o.p;b.onclick=()=>{pzSel.push(o);pzDraw();};pool.appendChild(b);});
+}
+function pzCheck(){
+  const q=PZ[pzI], got=pzSel.map(o=>o.p);
+  if(!got.length){showMsg($("#pz-msg"),"info","Primero toca algunas piezas 😉");return;}
+  if(got.join("")===q.ans.join("")){
+    pzDone.add(pzI); $("#sc-pz").textContent=pzDone.size; pzSteps(); pzTable(q.hi,q.result);
+    showMsg($("#pz-msg"),"ok",`🎉 ¡Correcto! <span class="mono">${q.ans.join("")}</span> → E2 muestra <b>${q.result}</b>`);
+    $("#pz-exp").innerHTML=`<div class="learn explain"><b>¿Cómo lo calcula Excel?</b><ol>${q.steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+      <div class="btns"><button class="btn pri" onclick="pzGo(${pzI+1})">${pzI+1<PZ.length?"Siguiente reto ➜":"Ver resultado final 🏁"}</button></div>`;
+    document.querySelectorAll("#pz-pool .pc,#pz-slots .pc").forEach(b=>b.disabled=true);
+    $("#pz-check").disabled=true; confetti(25);
+  } else {
+    let ok=0; while(ok<got.length&&got[ok]===q.ans[ok]) ok++;
+    let tip = got[0]!=="=" ? "Recuerda: toda fórmula empieza con <code>=</code>."
+      : ok===got.length ? `Vas bien, pero te faltan piezas (llevas ${got.length} de ${q.ans.length}).`
+      : `Las primeras <b>${ok}</b> pieza(s) están bien. Revisa desde <code>${got[ok]}</code>.`;
+    showMsg($("#pz-msg"),"bad","🤔 Todavía no. "+tip);
+  }
+}
+pzGo(0);
+</script>
+</body>
+</html>
